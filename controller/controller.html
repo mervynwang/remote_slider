@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="author" content="Mervyn Wang">
+
+<title> Remote Controller </title>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script type="text/javascript" src="jquery.gracefulWebSocket.js"></script>
+<script>
+var timer, clock , ws = { send : function(){}, onmessage : function(){} }, 
+startTimer = function startTimer(){
+	timer = setInterval(function(){
+		clock = clock? clock : (new Date()).getTime();
+		var runTime = Math.floor(((new Date()).getTime() - clock) / 1000)
+		, m = ( runTime > 60 )? (Math.floor(runTime/60)) : '00' 
+		, s = (runTime%60);
+		m = (m < 10 && m != 0)? '0'+m : m;
+		s = (s < 10)? '0'+s : s;
+		$('#timer')[0].innerHTML = m + ':' + s
+	},1000);
+}, 
+stopTimer = function stopTimer(){
+	clearInterval(timer);
+};
+
+var loadSlider = function loadSlider(){
+	var slideUrl = $('input[name=url]').val();
+	// start web scoket, init slide
+	if(!slideUrl) {
+	
+		alert('Url');
+		return false;
+	}
+	ws = $.gracefulWebSocket("ws://127.0.0.1:8080/");
+	
+	ws.send({'url':slideUrl});
+	ws.onmessage = function (event) {
+		var messageFromServer = event.data;
+		
+	};
+}
+
+
+
+</script>
+
+
+<script>
+(function(){
+	$('#startTimer').click(startTimer);
+	$('#stopTimer').click(stopTimer);
+})()
+</script>
+</head>
+<body>
+
+<input type="text" name="url" maxlength="200" size="100">
+<button id="ls"> Loading Slide </button>
+
+<iframe id="slide"> </iframe>
+
+<div id="timer">
+
+</div>
+<button id="startTimer"> Start </button>
+<button id="stopTimer"> Stop </button>
+
+
+
+</body>
+</html>
